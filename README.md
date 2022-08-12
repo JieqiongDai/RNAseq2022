@@ -87,12 +87,12 @@ The final deliverables include:
 #### Clone repository
 * Clone the repository to your working directory
 ```bash
-git clone git@bitbucket.org:quirozza/rnaseq.git
+git clone git@github.com:JieqiongDai/RNAseq2022.git
 ```
 
 #### Environment
 * Install Conda if not pre-installed
-* If not pre-installed, create a conda environment in the appropriate directory using the provided yaml file from the git cloned directory `envs/` and activate it after installation:
+* If not pre-installed, create a conda environment in the appropriate directory using the provided yaml file from the git cloned directory `workflow/envs/` and activate it after installation:
 ```bash
 conda env create -f RNAseq_env.yaml
 conda activate RNAseq
