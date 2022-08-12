@@ -1,0 +1,30 @@
+#!/bin/bash
+
+#$ --cpus-per-task=2
+#$ --mem=6g
+#$ --time=240:00:00
+#$ --output=log/sbatch.out
+#$ --partition=norm
+
+mkdir -p log
+
+module load singularity || exit 1
+
+snakemake --cores=1 --unlock
+
+sbcmd="sbatch --cpus-per-task={threads} \
+--output=log/snakejob_%j.out \
+--time={cluster.time} \
+--gres={cluster.scratch} \
+--mem={cluster.mem} \
+--partition={cluster.partition}"
+
+snakemake -pr \
+          --cluster-config config/cluster_slurm_config.yaml \
+          --cluster "$sbcmd" \
+          --keep-going \
+          --rerun-incomplete \
+          --jobs 100 \
+          --latency-wait 60 \
+          all \
+          2>log/snakemake.err

@@ -1,0 +1,13 @@
+#!/bin/bash
+mkdir -p log
+
+snakemake --cores=1 --unlock
+
+snakemake -pr \
+          --cores 24 \
+          --keep-going \
+          --rerun-incomplete \
+          --jobs 100 \
+          --latency-wait 60 \
+          all \
+          2>log/snakemake.err

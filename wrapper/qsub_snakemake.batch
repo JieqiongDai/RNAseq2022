@@ -1,0 +1,37 @@
+#!/bin/bash
+
+#$ -j yes
+#$ -N RNAseq
+#$ -o log/qsub.out
+#$ -pe smp 2
+#$ -q all.q
+#$ -P rsssqs
+#$ -cwd
+#$ -S /bin/bash
+#$ -V
+#$ -l h_vmem=6G
+
+mkdir -p log
+
+module load singularity || exit 1
+
+snakemake --unlock --cores=1
+
+qscmd="qsub -pe smp {threads} \
+-cwd \
+-q {cluster.queue} \
+-P {cluster.project} \
+-l h_vmem={cluster.mem} \
+-V -j y -cwd \
+-S /bin/bash \
+-o log"
+
+snakemake -pr \
+          --cluster-config config/cluster_SGE_config.yaml \
+          --cluster "$qscmd" \
+          --jobs 100 \
+          --latency-wait 60 \
+          --keep-going \
+          --rerun-incomplete \
+          all \
+          2>log/snakemake.err

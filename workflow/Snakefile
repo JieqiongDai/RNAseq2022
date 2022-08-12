@@ -1,0 +1,150 @@
+### Author: Jieqiong Dai
+
+### This Snakemake pipeline is for RNA-seq data QC and analysis
+## Four modules are included in the pipeline:
+# 1) Standard trimming (optional), gene-level alignment and quantification, and QC: rules/common.smk
+# 2) Optional transcript-level alignment and quantification: rules/transcript.smk
+# 3) Optional fusion calling: rules/fusion.smk
+# 4) Optional splicing analysis: rules/splicing.smk
+## The final deliverables include:
+# 1) A multiQC report of all QC metrics
+# 2) A gene read counts table
+# 3) output from optional run modes
+
+## vim: ft=python
+import sys
+import os
+import glob
+import itertools
+import re
+import pandas as pd
+
+# To terminate the script on any failure inside a pipe.
+shell.prefix("set -eo pipefail; ")
+configfile:"config/config.yaml"
+# The keyword localrules allows to mark a rule as local, so that it is not submitted to the cluster and instead executed on the host node.
+localrules: all
+
+# Run ID
+run_id = config["run_id"]
+
+# Run mode
+run_transcript = config.get("run_transcript","N")
+run_fusion = config.get("run_fusion","N")
+run_splicing = config.get("run_splicing","N")
+
+# Fastq file naming format
+fastq_name = config["fastq_name"]
+fastq_name = re.sub("/$","",fastq_name)
+# Sample ID delimitation
+name_split = config["name_split"]
+
+# Library strandedness
+strand = config["strand"]
+if strand == "non":
+    count_column = 1
+    qualimap_strand = "non-strand-specific"
+    rnaseqc_strand = ""
+    stringtie_strand = ""
+elif strand == "F":
+    count_column = 2
+    qualimap_strand = "strand-specific-forward"
+    rnaseqc_strand = "--stranded FR"
+    stringtie_strand = "--fr"
+elif strand == "R":
+    count_column = 3
+    qualimap_strand = "strand-specific-reverse"
+    rnaseqc_strand = "--stranded RF"
+    stringtie_strand = "--rf"
+
+# Reference genome build
+build = config["build"]
+
+# Target enrichment if any
+target = config["target"]
+if target != "":
+    bamqc_target = "-gff " + target
+else:
+    bamqc_target = ""
+
+# Path
+run = os.getcwd() + "/"
+fastq = config["fastq"]
+fastq = re.sub("/$","",fastq)
+out = config.get("out","output")
+out = re.sub("/$","",out)
+ref = config["reference"]
+gtf = config["gtf"]
+star_indice = config["star_indice"]
+salmon_indice = config["salmon_indice"]
+genome_lib = config["genome_lib"]
+gencode_gtf = config["gencode_gtf"]
+bind = config["bind"]
+image = config["image"]
+
+# Parameters
+trim = config["trim"]
+star = config["star"]
+bamqc = config["bamqc"]
+rnaseq = config["rnaseq"]
+rnaseqc = config["rnaseqc"]
+salmon = config["salmon"]
+star_fusion = config["star_fusion"]
+stringtie = config["stringtie"]
+gffcmp = config["gffcmp"]
+multiqc_config = "config/multiqc_config.yaml"
+dt_enrich = config["dt_enrich"]
+java_mem = config.get("java_mem","20G")
+
+# Sample IDs
+def Parse_SampleID(fname):
+    return fname.split(fastq + '/')[-1].split(name_split + '1.fastq.gz')[0].split(name_split + '2.fastq.gz')[0]
+file = sorted(glob.glob(fastq + '/*.fastq.gz'), key=Parse_SampleID)
+d = {}
+for key, value in itertools.groupby(file, Parse_SampleID):
+    d[key] = list(value)
+samples = d.keys()
+
+# Optional trimming
+trimming = config.get("trimming", "Y")
+if trimming == "Y":
+    r1 = out + "/trimmed/{sample}/{sample}_trimmed_R1.fastq.gz"
+    r2 = out + "/trimmed/{sample}/{sample}_trimmed_R2.fastq.gz"
+elif trimming == "N":
+    r1 = fastq + "/" + fastq_name + "_R1.fastq.gz"
+    r2 = fastq + "/" + fastq_name + "_R2.fastq.gz"
+
+# Optional pre-trimming QC
+pre_qc = config.get("pre_qc","N")
+
+# Output files
+multiqc = out + "/archive/deliverbale/" + run_id + "_" + build + "_multiqc_report.html"
+gene_count = out + "/archive/deliverbale/" + run_id + "_" + build + "_counts_by_gene.csv"
+transcript_count = out + "/archive/deliverbale/" + run_id + "_" + build + "_counts_by_transcript.csv"
+tpm = out + "/archive/deliverbale/" + run_id + "_" + build + "_TPM_by_transcript.csv"
+fusions = out + "/archive/deliverbale/" + run_id + "_" + build + "fusion/{sample}_star-fusion.fusion_predictions.tsv"
+fusion_all = expand(fusions, sample = samples)
+splicing_gtf = out + "/archive/deliverbale/" + run_id + "_" + build + "splicing/{sample}.gtf"
+splicing_gtf_all = expand(splicing_gtf, sample = samples)
+splicing_gtf_anno = out + "/archive/deliverbale/" + run_id + "_" + build + "splicing/{sample}_gffcmp.annotated.gtf"
+splicing_gtf_anno_all = expand(splicing_gtf_anno, sample = samples)
+splicing_stat = out + "/archive/deliverbale/" + run_id + "_" + build + "splicing/{sample}_gffcmp.stats"
+splicing_stat_all = expand(splicing_stat, sample = samples)
+splicing_fasta = out + "/archive/deliverbale/" + run_id + "_" + build + "splicing/{sample}_gffread.fa"
+splicing_fasta_all = expand(splicing_fasta, sample = samples)
+
+include: "rules/common.smk"
+include: "rules/transcript.smk"
+include: "rules/fusion.smk"
+include: "rules/splicing.smk"
+
+rule all:
+    input:
+          gene_count,
+          multiqc,
+          [transcript_count, tpm] if run_transcript == "Y" else [],
+          lambda wildcards: fusion_all if run_fusion == "Y" else [],
+          lambda wildcards: splicing_gtf_all if run_splicing == "Y" else [],
+          lambda wildcards: splicing_gtf_anno_all if run_splicing == "Y" else [],
+          lambda wildcards: splicing_stat_all if run_splicing == "Y" else [],
+          lambda wildcards: splicing_fasta_all if run_splicing == "Y" else []

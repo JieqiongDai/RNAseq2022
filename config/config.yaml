@@ -1,0 +1,99 @@
+# Run ID, consistent with the bnotebook project ID
+run_id: ""
+
+# Run mode choise, Y or N
+run_transcript: ""
+run_fusion: ""
+run_splicing: ""
+
+# Perform trimming, Y or N, default Y
+trimming: ""
+
+# If needs pre-trimming QC, Y or N, default N
+pre_qc: ""
+
+# Library strandedness.
+## Options: non, F, R.
+## F refers to the 1st read strand aligned with RNA (htseq-count option -s yes)
+## R refers to the 2nd read strand aligned with RNA (htseq-count option -s reverse)
+strand: ""
+
+# Path to the merged fastq files stored directory
+fastq: "{path_to_fastq_files}"
+# Sample ID delimitation
+## "_sub_R" for subsampling
+name_split: "_R"
+# Naming format of fastq files
+## "{sample}_sub" for subsampling
+fastq_name: "{sample}"
+
+# Path to the output directory
+out: "output"
+
+# Reference genome build
+build: ""
+# Path to reference genome fasta file
+reference: "{path_to_ref_fasta_file}"
+# Path to reference genome annotation GTF file
+gtf: "{path_to_GTF_file}"
+# Path to STAR indices
+star_indice: "{path_to_STAR_index}"
+# Path to Salmon indices
+salmon_indice: "{path_to_salmon_index}"
+# Path to Gencode collapsed annotation file, for rRNA estimation
+gencode_gtf: "{path_to_gencode_collapsed_gtf_file}"
+# Path to target enrichment bed file if any
+target: ""
+
+# Path to Singularity bind-mounted directories
+## Bind the fastq directory as well if the trimming step is turned off
+bind: "{path},{path}"
+# Path to STAR-Fusion Singularity image
+image: "{path_to_STAR_fusion_singularity_image}"
+
+# Fastp trimming parameters
+## [-f 3 -F 3 -3 -W 5 -q 20 -u 40 -l 50 -x -g] parames in SOP
+trim: "-q 20 -u 20 -c -5 -3 -g -x -p"
+
+# STAR alingment parameters
+## [--outSAMstrandField] intronMotif option, alignments with XS strand attribute, for Cufflinks, Stringtie
+## [--outFilterIntronMotifs intronMotif] RemoveNoncanonical, for Cufflinks
+## [--outSAMattrIHstart 0] start value for the IH attribute, default 1. 0 may be required by some downstream software, such as Cufflinks or StringTie.
+## [--alignSoftClipAtReferenceEnds no] prohibit the soft-clipping of the alignments past the end of the chromosomes, useful for compatibility with Cufflinks
+star: "--outSAMstrandField intronMotif"
+
+# Java memory
+java_mem: ""
+
+# Qualimap BamQC Parameters
+## [-gd <arg>] Species to compare with genome GC distribution. Possible values: hg19; mm9; mm10
+bamqc: ""
+
+# Qualimap RNAseq parameters
+rnaseq: ""
+
+# RNA-SeQC parameters
+rnaseqc: ""
+
+# DeepTools plotEnrichment parameters
+dt_enrich: ""
+
+# Salmon parameters
+salmon: ""
+
+# StringTie parameters
+##  [--conservative] Conservative transcriptome assembly, same as -t -c 1.5 -f 0.05
+## [-m 180] Minimum assembled transcript length (default: 200)
+## [-j 3] Minimum junction coverage (default: 1)
+## [-f 0.01] Minimum isoform fraction (default: 0.01)
+## [-c 1.5] Minimum reads per bp coverage to consider for multi-exon transcript (default: 1)
+## [-e] Only estimate the abundance of given reference transcripts (requires -G)
+stringtie: "-c 1.5 -m 180 -j 3"
+
+# GffCompare parameters
+gffcmp: ""
+
+# STAR-Fusion parameters
+star_fusion: ""
+# Path to STAR-Fusion genome_lib
+genome_lib: "{path_to_STAR_fusion_genome_lib}"

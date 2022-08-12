@@ -1,0 +1,39 @@
+__default__:
+    mem: 24G
+    queue: 'all.q'
+    project: 'rsssqs'
+
+Align:
+    mem: 64G
+    queue: 'all.q'
+    project: 'rsssqs'
+
+Qualimap_Bamqc:
+    mem: 32G
+    queue: 'all.q'
+    project: 'rsssqs'
+
+Qualimap_Rnaseq:
+    mem: 32G
+    queue: 'all.q'
+    project: 'rsssqs'
+
+Rnaseqc:
+    mem: 32G
+    queue: 'all.q'
+    project: 'rsssqs'
+
+Star_Fusion:
+    mem: 64g
+    queue: 'all.q'
+    project: 'rsssqs'
+
+Stringtie:
+    mem: 64g
+    queue: 'all.q'
+    project: 'rsssqs'
+
+Salmon:
+    mem: 64g
+    queue: 'all.q'
+    project: 'rsssqs'

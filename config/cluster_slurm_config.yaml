@@ -1,0 +1,47 @@
+__default__:
+    mem: 24g
+    partition: quick,norm
+    time: '4:00:00'
+    scratch: lscratch:10
+
+Align:
+    mem: 64g
+    partition: norm
+    time: '240:00:00'
+    scratch: lscratch:100
+
+Qualimap_Bamqc:
+    mem: 32g
+    partition: quick,norm
+    time: '4:00:00'
+    scratch: lscratch:10
+
+Qualimap_Rnaseq:
+    mem: 32g
+    partition: quick,norm
+    time: '4:00:00'
+    scratch: lscratch:10
+
+Rnaseqc:
+    mem: 32g
+    partition: quick,norm
+    time: '4:00:00'
+    scratch: lscratch:10
+
+Star_Fusion:
+    mem: 64g
+    partition: norm
+    time: '240:00:00'
+    scratch: lscratch:100
+
+Stringtie:
+    mem: 64g
+    partition: norm
+    time: '240:00:00'
+    scratch: lscratch:10
+
+Salmon:
+    mem: 64g
+    partition: norm
+    time: '240:00:00'
+    scratch: lscratch:100

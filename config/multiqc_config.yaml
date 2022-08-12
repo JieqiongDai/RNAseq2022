@@ -1,0 +1,92 @@
+# Header information
+report_header_info:
+  - Contact: "Jieqiong Dai, jieqiong.dai@roche.com"
+  - Application Type: "RNA-seq QC and data analysis"
+
+# Custom data (may trigger issues for v1.12)
+custom_data:
+  enrichment:
+    plot_type: "generalstats"
+  tanscript_count:
+    plot_type: "generalstats"
+sp:
+  enrichment:
+    fn: "*onTarget.csv"
+  tanscript_count:
+    fn: "*transcripts_detected.csv"
+
+# Section comments
+section_comments:
+  general_stats:
+    "<h4>For each sample, files with respective Sample-Name surffix represent:</h4> \
+    <h5> {sample_ID} - alignment QC </h5> \
+    <h5> {sample_ID}_R1 (without paired {sample_ID}_R2 ) - trimming QC if applied </h5>  \
+    <h5> {sample_ID}_R1 and {sample_ID}_R2 - QC of initial reads </h5> \
+    <h5> {sample_ID}_trimmed_sub_R1 and {sample_ID}_trimmed_sub_R2 - QC of trimmed and subsampled reads if applied </h5> \
+    <h5> {sample_ID}_cnsns_R1 and {sample_ID}_cnsns_R2 - QC of trimmed and UMI based consensus reads if applied </h5> \
+    <h5> {sample_ID}_sub_cnsns_R1 and {sample_ID}_sub_cnsns_R2 - QC of trimmed, subsampled and UMI based consensus reads if applied </h5> \
+    <h5> {sample_ID}_target - alingment QC on targeted regions if applied </h5> \
+    <h5> {sample_ID}_trimmed_R1 and {sample_ID}_trimmed_R2 - QC of trimmed reads if applied </h5>"
+
+# Visibility of columns in general statistics
+table_columns_visible:
+  QualiMap:
+    median_coverage: False
+    general_error_rate: True
+    percentage_aligned: False
+    reads_aligned: False
+  Snippy:
+    VariantTotal: False
+  fastp:
+    after_filtering_gc_content: False
+  FastQC:
+    percent_duplicates: False
+    avg_sequence_length: True
+
+# Re-order table columns
+table_columns_placement:
+  enrichment:
+    onTarget_ReadCount: 500
+    onTarget_Rate_percentage: 600
+  tanscript_count:
+    "#_Transcripts": 800
+  RNA-SeQC:
+    Genes Detected: 700
+    Expression Profiling Efficiency: 900
+  Salmon:
+    num_mapped: 200
+    percent_mapped: 400
+  STAR:
+    uniquely_mapped: 100
+    uniquely_mapped_percent: 300
+
+# Rename table column titles (only works for v1.12)
+table_columns_name:
+  STAR:
+    uniquely_mapped: "M Aligned (genomic)"
+    uniquely_mapped_percent: "% Aligned (genomic)"
+  Salmon:
+    num_mapped: "M Aligned (transcript)"
+    percent_mapped: "% Aligned (transcript)"
+  enrichment:
+    onTarget_ReadCount: "On Target Reads Count"
+    onTarget_Rate_percentage: "On Target Rate (%)"
+  tanscript_count:
+    "#_Transcripts": "# Transcripts"
+  QualiMap:
+    avg_gc: "% GC (alignment)"
+  FastQC:
+    percent_gc: "% GC (sequence)"
+
+# Fastp file
+fastp:
+  fn: '*fastp.json'
+
+# Excluded sections
+remove_sections:
+#  - qualimap-coverage-histogram
+  - fastqc_sequence_counts
+
+# Excluded mudules
+exclude_modules:
+  - snippy

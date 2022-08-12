@@ -1,0 +1,20 @@
+name: RNAseq
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - bedtools
+  - deeptools
+  - fastp
+  - fastqc
+  - gffcompare
+  - gffread
+  - multiqc=1.12
+  - qualimap
+  - rna-seqc
+  - salmon=1.6.0
+  - samtools
+  - snakemake=6.13.1
+  - star
+  - stringtie
